@@ -1,0 +1,54 @@
+[ENABLE]
+
+aobscanmodule(INJECT,GameClient.exe,ERROR: Could not find unique AOB, tried code "F3 0F 11 04 08") // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss [eax+ecx],xmm0 //Edit this right here to make yourself have inf health
+  jmp return
+
+INJECT+B20268:
+  jmp newmem
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT+B20268:
+  db F3 0F 11 04 08
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "GameClient.exe"+453E36
+
+"GameClient.exe"+453E1A: 7E 1F              -  jle GameClient.exe+453E3B
+"GameClient.exe"+453E1C: 5F                 -  pop edi
+"GameClient.exe"+453E1D: 5E                 -  pop esi
+"GameClient.exe"+453E1E: C7 00 00 00 00 00  -  mov [eax],00000000
+"GameClient.exe"+453E24: 5B                 -  pop ebx
+"GameClient.exe"+453E25: 83 C4 08           -  add esp,08
+"GameClient.exe"+453E28: C3                 -  ret
+"GameClient.exe"+453E29: 8B 4F 10           -  mov ecx,[edi+10]
+"GameClient.exe"+453E2C: 8B 44 24 24        -  mov eax,[esp+24]
+"GameClient.exe"+453E30: F3 0F 10 44 24 2C  -  movss xmm0,[esp+2C]
+// ---------- INJECTING HERE ----------
+"GameClient.exe"+453E36: F3 0F 11 04 08     -  movss [eax+ecx],xmm0
+// ---------- DONE INJECTING  ----------
+"GameClient.exe"+453E3B: 5F                 -  pop edi
+"GameClient.exe"+453E3C: 5E                 -  pop esi
+"GameClient.exe"+453E3D: 5B                 -  pop ebx
+"GameClient.exe"+453E3E: 83 C4 08           -  add esp,08
+"GameClient.exe"+453E41: C3                 -  ret
+"GameClient.exe"+453E42: CC                 -  int 3
+"GameClient.exe"+453E43: CC                 -  int 3
+"GameClient.exe"+453E44: CC                 -  int 3
+"GameClient.exe"+453E45: CC                 -  int 3
+"GameClient.exe"+453E46: CC                 -  int 3
+}
